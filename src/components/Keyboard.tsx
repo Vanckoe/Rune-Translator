@@ -1,10 +1,13 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import Paper from '@/assets/Paper';
 
 interface CustomKeyboardProps {
   onValueChange?: (value: string) => void;
 }
 
+/* ---------- раскладки клавиатуры ---------- */
 const LATIN_LAYOUT = [
   ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
@@ -34,6 +37,7 @@ const RUNIC_LAYOUT = [
   ['𐱇', '𐱈', '𐱉', '𐱊', '𐱋', '𐱌', '𐱍', '𐱎', '𐱏', '𐱐'],
 ];
 
+/* ---------- соответствия символов ---------- */
 const runicMap: Record<string, string> = {
   a: '𐰀',
   e: '𐰀',
@@ -121,12 +125,6 @@ const runicMap: Record<string, string> = {
   ҳ: '𐰴',
   ї: '𐰃',
 };
-const transliterateToRunic = (input: string): string => {
-  return input
-    .split('')
-    .map((char) => runicMap[char.toLowerCase()] || char)
-    .join('');
-};
 
 const reverseRunicMap: Record<string, { latin: string; cyrillic: string }> = {
   '𐰀': { latin: 'a', cyrillic: 'а' },
@@ -150,60 +148,109 @@ const reverseRunicMap: Record<string, { latin: string; cyrillic: string }> = {
   '𐰖': { latin: 'y', cyrillic: 'й' },
 };
 
-const transliterateFromRunic = (input: string, layout: string): string => {
-  return input
+/* ---------- функции транслитерации ---------- */
+const transliterateToRunic = (str: string): string =>
+  str
     .split('')
-    .map((char) => {
-      const mapping = reverseRunicMap[char];
-      if (!mapping) return char;
-      return layout === 'LATIN' ? mapping.latin : mapping.cyrillic;
+    .map((ch) => runicMap[ch.toLowerCase()] ?? ch)
+    .join('');
+
+const transliterateFromRunic = (
+  str: string,
+  layout: 'LATIN' | 'CYRILLIC'
+): string =>
+  str
+    .split('')
+    .map((ch) => {
+      const map = reverseRunicMap[ch];
+      if (!map) return ch;
+      return layout === 'LATIN' ? map.latin : map.cyrillic;
     })
     .join('');
-};
 
+/* ---------- сам компонент ---------- */
 const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
+  /** текст нижнего поля (латиница/кириллица) */
   const [inputValue, setInputValue] = useState('');
+  /** текст верхнего поля (руны) */
+  const [inputRunic, setInputRunic] = useState('');
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied!');
+  };
+
   type Layout = 'LATIN' | 'CYRILLIC' | 'RUNIC';
   const [layout, setLayout] = useState<Layout>('LATIN');
+  /** последняя не-рунная раскладка (для перевода) */
+  const [targetLayout, setTargetLayout] =
+    useState<Exclude<Layout, 'RUNIC'>>('LATIN');
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  /* ---------- переключатель раскладок ---------- */
+  const toggleLayout = () => {
+    if (layout === 'LATIN') {
+      setLayout('CYRILLIC');
+      setTargetLayout('CYRILLIC');
+    } else if (layout === 'CYRILLIC') {
+      setLayout('RUNIC');
+    } else if (layout === 'RUNIC') {
+      setLayout('LATIN');
+      setTargetLayout('LATIN');
+    }
+  };
+
+  /* ---------- синхронизация при смене раскладки ---------- */
+  useEffect(() => {
+    if (layout === 'RUNIC') {
+      setInputValue(transliterateFromRunic(inputRunic, targetLayout));
+    } else {
+      setInputRunic(transliterateToRunic(inputValue));
+    }
+  }, [layout]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ---------- обработчики ввода ---------- */
+  const handleLatinCyrChange = (val: string) => {
+    setInputValue(val);
+    setInputRunic(transliterateToRunic(val));
+    onValueChange?.(val);
+  };
+
+  const handleRunicChange = (val: string) => {
+    setInputRunic(val);
+    const converted = transliterateFromRunic(val, targetLayout);
+    setInputValue(converted);
+    onValueChange?.(converted);
+  };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
-    const pastedText = e.clipboardData.getData('text');
-    const newValue = inputValue + pastedText;
-    setInputValue(newValue);
-    onValueChange?.(newValue);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    onValueChange?.(newValue);
+    const pasted = e.clipboardData.getData('text');
+    if (layout === 'RUNIC') {
+      handleRunicChange(inputRunic + pasted);
+    } else {
+      handleLatinCyrChange(inputValue + pasted);
+    }
   };
 
   const handleKeyPress = (key: string) => {
-    let newValue = inputValue;
-    if (key === 'bksp') {
-      newValue = inputValue.slice(0, -1);
-    } else if (key === 'space') {
-      newValue = inputValue + ' ';
+    if (layout === 'RUNIC') {
+      let val = inputRunic;
+      if (key === 'bksp') val = val.slice(0, -1);
+      else if (key === 'space') val += ' ';
+      else val += key;
+      handleRunicChange(val);
     } else {
-      newValue = inputValue + key;
+      let val = inputValue;
+      if (key === 'bksp') val = val.slice(0, -1);
+      else if (key === 'space') val += ' ';
+      else val += key;
+      handleLatinCyrChange(val);
     }
-    setInputValue(newValue);
-    onValueChange?.(newValue);
   };
 
-  const toggleLayout = () => {
-    setLayout(
-      layout === 'LATIN'
-        ? 'CYRILLIC'
-        : layout === 'CYRILLIC'
-        ? 'RUNIC'
-        : 'LATIN'
-    );
-  };
-
+  /* ---------- текущий набор кнопок ---------- */
   const currentLayout =
     layout === 'LATIN'
       ? LATIN_LAYOUT
@@ -211,61 +258,100 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
       ? CYRILLIC_LAYOUT
       : RUNIC_LAYOUT;
 
+  /* ---------- JSX ---------- */
   return (
     <>
+      <Toaster position="top-center" />
       <div className="relative w-full flex flex-col gap-5">
-        <button
-          onClick={toggleLayout}
-          className="px-4 py-2 w-fit bg-blue-600 text-white rounded-lg hover:bg-blue-500"
-        >
-          Switch to{' '}
-          {layout === 'LATIN'
-            ? 'Cirilic'
-            : layout === 'CYRILLIC'
-            ? 'Runic'
-            : 'Latinic'}
-        </button>
         <div className="flex flex-col gap-5 md:flex-row justify-between w-full">
-          <div className="w-full md:pr-10">
+          {/* верхнее поле (руны) */}
+          <div className="w-full flex flex-col md:pr-10">
             <textarea
               ref={inputRef}
-              value={transliterateFromRunic(
-                transliterateToRunic(inputValue),
-                layout
-              )}
+              value={
+                layout === 'RUNIC'
+                  ? inputRunic
+                  : transliterateToRunic(inputValue)
+              }
               placeholder="...𐰢𐰆𐰤𐱅𐰀 𐱅𐰀𐰼𐰃𐰭𐰃𐰔"
-              onChange={handleChange}
+              onChange={(e) =>
+                layout === 'RUNIC' && handleRunicChange(e.target.value)
+              }
               onPaste={handlePaste}
               rows={4}
               className="w-full p-2 bg-transparent text-2xl text-end rounded-lg md:mb-4 focus:outline-none"
+              readOnly={layout !== 'RUNIC'}
             />
+            <div className="flex flex-row gap-5 items-center ">
+              <button
+                onClick={toggleLayout}
+                className="px-4 py-2 w-fit rounded-lg border  hover:scale-95 transition-transform"
+              >
+                {layout === 'LATIN'
+                  ? 'Latin'
+                  : layout === 'CYRILLIC'
+                  ? 'Cyrillic'
+                  : targetLayout === 'LATIN'
+                  ? 'Latin'
+                  : 'Runic'}
+              </button>
+              <button
+                onClick={() =>
+                  handleCopy(
+                    layout === 'RUNIC'
+                      ? inputRunic
+                      : transliterateToRunic(inputValue)
+                  )
+                }
+                className="px-4 py-2 flex flex-row items-center gap-3 w-fit rounded-lg border hover:scale-95 transition-transform"
+                title="Копировать текст"
+              >
+                <Paper color="white" /> Copy
+              </button>
+            </div>
           </div>
 
+          {/* нижнее поле (латиница/кириллица) */}
           <div className="w-full border-t md:border-t-0 pt-5 md:pt-0 md:border-l md:pl-10">
-            <textarea
-              ref={inputRef}
-              value={inputValue}
-              placeholder="Type here..."
-              onChange={handleChange}
-              onPaste={handlePaste}
-              rows={4}
-              className="w-full p-2 bg-transparent text-2xl rounded-lg mb-4 focus:outline-none"
-            />
+            <div className="relative">
+              <textarea
+                value={inputValue}
+                placeholder="Type here..."
+                onChange={(e) =>
+                  layout !== 'RUNIC' && handleLatinCyrChange(e.target.value)
+                }
+                onPaste={handlePaste}
+                rows={4}
+                className="w-full p-2 bg-transparent text-2xl rounded-lg md:mb-4 focus:outline-none"
+                readOnly={layout === 'RUNIC'}
+              />
+            </div>
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-6 md:grid-cols-10 w-full gap-2 mt-4">
-        {currentLayout.flat().map((key: string, idx: number) => (
+
+      {/* виртуальная клавиатура */}
+      <div className="grid grid-cols-6 md:grid-cols-10 w-full gap-2 md:mt-4">
+        {currentLayout.flat().map((key, idx) => (
           <button
             key={idx}
-            className="p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+            className={`p-2 ${
+              layout === 'RUNIC'
+                ? 'bg-gray-700 hover:bg-gray-800'
+                : 'bg-gray-800 hover:bg-gray-700'
+            } text-white rounded-lg`}
             onClick={() => handleKeyPress(key)}
           >
             {key}
           </button>
         ))}
+
         <button
-          className="col-span-4 md:col-span-2 p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+          className={`col-span-4 md:col-span-2 p-2 ${
+            layout === 'RUNIC'
+              ? 'bg-gray-700 hover:bg-gray-800'
+              : 'bg-gray-800 hover:bg-gray-700'
+          } text-white rounded-lg`}
           onClick={() => handleKeyPress('space')}
         >
           space
