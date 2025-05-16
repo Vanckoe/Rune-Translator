@@ -83,10 +83,10 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
           Switch to {layout === 'EN' ? 'Cirilic' : 'Latinic'}
         </button>
         <div className="flex flex-row justify-between w-full">
-          <div className="w-full p-2 mb-4 text-end pr-10">
+          <div className="w-full p-2 mb-4 text-end pr-4 md:pr-10">
             {transliterateToRunic(inputValue)}
           </div>
-          <div className="w-full border-l pl-10">
+          <div className="w-full border-l pl-4 md:pl-10">
             <input
               ref={inputRef}
               type="text"
@@ -94,7 +94,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
               placeholder='Type here...'
               onChange={handleChange}
               onPaste={handlePaste}
-              className="w-full p-2 bg-transparent text-white rounded-lg mb-4 focus:outline-none"
+              className="w-full p-2 bg-transparent text-wrap text-white rounded-lg mb-4 focus:outline-none"
             />
           </div>
         </div>
