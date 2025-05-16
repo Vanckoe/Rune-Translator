@@ -5,16 +5,16 @@ interface CustomKeyboardProps {
   onValueChange?: (value: string) => void;
 }
 
-const EN_LAYOUT = [
+const LATIN_LAYOUT = [
   ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
   ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
   ['z', 'c', 'v', 'b'],
-  ['n', 'm','o‘', 'ə', 'ç', 'ğ'],
-  ['ı', 'ö', 'ş', 'ü',  'g‘', 'sh', 'ch'],
+  ['n', 'm', 'o‘', 'ə', 'ç', 'ğ'],
+  ['ı', 'ö', 'ş', 'ü', 'g‘', 'sh', 'ch'],
 ];
 
-const RU_LAYOUT = [
+const CYRILLIC_LAYOUT = [
   ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
   ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з'],
   ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д'],
@@ -108,7 +108,6 @@ const runicMap: Record<string, string> = {
   ь: '',
   ҳ: '𐰴',
   ї: '𐰃',
-
 };
 const transliterateToRunic = (input: string): string => {
   return input
@@ -117,26 +116,26 @@ const transliterateToRunic = (input: string): string => {
     .join('');
 };
 
-const reverseRunicMap: Record<string, { en: string; ru: string }> = {
-  '𐰀': { en: 'a', ru: 'а' },
-  '𐰃': { en: 'i', ru: 'и' },
-  '𐰆': { en: 'o', ru: 'о' },
-  '𐰇': { en: 'ö', ru: 'ө' },
-  '𐰉': { en: 'b', ru: 'б' },
-  '𐰯': { en: 'p', ru: 'п' },
-  '𐱅': { en: 't', ru: 'т' },
-  '𐰴': { en: 'k', ru: 'к' },
-  '𐰍': { en: 'g', ru: 'г' },
-  '𐰢': { en: 'm', ru: 'м' },
-  '𐰤': { en: 'n', ru: 'н' },
-  '𐰭': { en: 'ñ', ru: 'ң' },
-  '𐰠': { en: 'l', ru: 'л' },
-  '𐰼': { en: 'r', ru: 'р' },
-  '𐰽': { en: 's', ru: 'с' },
-  '𐰔': { en: 'z', ru: 'з' },
-  '𐰲': { en: 'ch', ru: 'ч' },
-  '𐰳': { en: 'sh', ru: 'ш' },
-  '𐰖': { en: 'y', ru: 'й' },
+const reverseRunicMap: Record<string, { latin: string; cyrillic: string }> = {
+  '𐰀': { latin: 'a', cyrillic: 'а' },
+  '𐰃': { latin: 'i', cyrillic: 'и' },
+  '𐰆': { latin: 'o', cyrillic: 'о' },
+  '𐰇': { latin: 'ö', cyrillic: 'ө' },
+  '𐰉': { latin: 'b', cyrillic: 'б' },
+  '𐰯': { latin: 'p', cyrillic: 'п' },
+  '𐱅': { latin: 't', cyrillic: 'т' },
+  '𐰴': { latin: 'k', cyrillic: 'к' },
+  '𐰍': { latin: 'g', cyrillic: 'г' },
+  '𐰢': { latin: 'm', cyrillic: 'м' },
+  '𐰤': { latin: 'n', cyrillic: 'н' },
+  '𐰭': { latin: 'ñ', cyrillic: 'ң' },
+  '𐰠': { latin: 'l', cyrillic: 'л' },
+  '𐰼': { latin: 'r', cyrillic: 'р' },
+  '𐰽': { latin: 's', cyrillic: 'с' },
+  '𐰔': { latin: 'z', cyrillic: 'з' },
+  '𐰲': { latin: 'ch', cyrillic: 'ч' },
+  '𐰳': { latin: 'sh', cyrillic: 'ш' },
+  '𐰖': { latin: 'y', cyrillic: 'й' },
 };
 
 const transliterateFromRunic = (input: string, layout: string): string => {
@@ -145,14 +144,14 @@ const transliterateFromRunic = (input: string, layout: string): string => {
     .map((char) => {
       const mapping = reverseRunicMap[char];
       if (!mapping) return char;
-      return layout === 'EN' ? mapping.en : mapping.ru;
+      return layout === 'LATIN' ? mapping.latin : mapping.cyrillic;
     })
     .join('');
 };
 
 const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
   const [inputValue, setInputValue] = useState('');
-  const [layout, setLayout] = useState('EN');
+  const [layout, setLayout] = useState('LATIN');
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -183,10 +182,10 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
   };
 
   const toggleLayout = () => {
-    setLayout(layout === 'EN' ? 'RU' : 'EN');
+    setLayout(layout === 'LATIN' ? 'CYRILLIC' : 'LATIN');
   };
 
-  const currentLayout = layout === 'EN' ? EN_LAYOUT : RU_LAYOUT;
+  const currentLayout = layout === 'LATIN' ? LATIN_LAYOUT : CYRILLIC_LAYOUT;
 
   return (
     <>
@@ -195,7 +194,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
           onClick={toggleLayout}
           className="px-4 py-2 w-fit bg-blue-600 text-white rounded-lg hover:bg-blue-500"
         >
-          Switch to {layout === 'EN' ? 'Cirilic' : 'Latinic'}
+          Switch to {layout === 'LATIN' ? 'Cirilic' : 'Latinic'}
         </button>
         <div className="flex flex-col gap-5 md:flex-row justify-between w-full">
           <div className="w-full md:pr-10">
