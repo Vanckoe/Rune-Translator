@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface CustomKeyboardProps {
   onValueChange?: (value: string) => void;
@@ -22,6 +22,15 @@ const RU_LAYOUT = [
 const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
   const [inputValue, setInputValue] = useState('');
   const [layout, setLayout] = useState('EN');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData('text');
+    const newValue = inputValue + pastedText;
+    setInputValue(newValue);
+    onValueChange?.(newValue);
+  };
 
   const handleKeyPress = (key: string) => {
     let newValue = inputValue;
@@ -36,23 +45,17 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
     onValueChange?.(newValue);
   };
 
-  const handleKeyboardEvent = (e: KeyboardEvent) => {
-    const key = e.key.toLowerCase();
-    if (key === 'backspace') {
-      handleKeyPress('bksp');
-    } else if (key === ' ') {
-      handleKeyPress(' ');
-    } else if (/^[a-zа-я0-9]$/i.test(key)) {
-      handleKeyPress(key);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    onValueChange?.(newValue);
   };
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyboardEvent);
-    return () => {
-      window.removeEventListener('keydown', handleKeyboardEvent);
-    };
-  }, [inputValue]);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   const toggleLayout = () => {
     setLayout(layout === 'EN' ? 'RU' : 'EN');
@@ -62,14 +65,24 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
 
   return (
     <>
-      <button
-        onClick={toggleLayout}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"
-      >
-        Switch to {layout === 'EN' ? 'Cirilic' : 'Latinic'}
-      </button>
+      <div className="relative">
+        <input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={handleChange}
+          onPaste={handlePaste}
+          className="w-full p-2 bg-transparent text-white rounded-lg mb-4 border border-gray-700 focus:outline-none"
+        />
+        <button
+          onClick={toggleLayout}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"
+        >
+          Switch to {layout === 'EN' ? 'Cirilic' : 'Latinic'}
+        </button>
+      </div>
       <div className="grid grid-cols-10 gap-2 mt-4">
-        {currentLayout.flat().map((key, idx) => (
+        {currentLayout.flat().map((key: string, idx: number) => (
           <button
             key={idx}
             className="p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
