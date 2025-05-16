@@ -65,21 +65,27 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
 
   return (
     <>
-      <div className="relative">
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={handleChange}
-          onPaste={handlePaste}
-          className="w-full p-2 bg-transparent text-white rounded-lg mb-4 border border-gray-700 focus:outline-none"
-        />
+      <div className="relative w-full flex flex-col gap-5">
         <button
           onClick={toggleLayout}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"
+          className="px-4 py-2 w-fit bg-blue-600 text-white rounded-lg hover:bg-blue-500"
         >
           Switch to {layout === 'EN' ? 'Cirilic' : 'Latinic'}
         </button>
+        <div className="flex flex-row justify-between w-full">
+          <div className="w-full p-2 mb-4 text-end pr-10">wefewfwef</div>
+          <div className="w-full border-l pl-10">
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              placeholder='Type here...'
+              onChange={handleChange}
+              onPaste={handlePaste}
+              className="w-full p-2 bg-transparent text-white rounded-lg mb-4 focus:outline-none"
+            />
+          </div>
+        </div>
       </div>
       <div className="grid grid-cols-10 gap-2 mt-4">
         {currentLayout.flat().map((key: string, idx: number) => (

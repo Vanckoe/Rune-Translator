@@ -8,13 +8,7 @@ export default function Home() {
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex w-full md:w-[60%] mx-auto border rounded-[1.25rem] p-10 flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <div className="flex flex-row justify-between w-full">
-          <div className="w-full">wefewfwef</div>
-          <div className="w-full border-l pl-10">
-            {inputValue || 'Начните вводить текст...'}
-          </div>
-        </div>
+      <main className="flex w-full md:w-[60%] mx-auto border rounded-[1rem] p-10 flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <CustomKeyboard
           onValueChange={(value) => {
             setInputValue(value);
