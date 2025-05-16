@@ -62,16 +62,11 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
 
   return (
     <>
-      <input
-        value={inputValue}
-        readOnly
-        className="w-full p-2 text-white rounded-lg mb-4 border border-gray-700 focus:outline-none"
-      />
       <button
         onClick={toggleLayout}
         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"
       >
-        Switch to {layout === 'EN' ? 'RU' : 'EN'}
+        Switch to {layout === 'EN' ? 'Cirilic' : 'Latinic'}
       </button>
       <div className="grid grid-cols-10 gap-2 mt-4">
         {currentLayout.flat().map((key, idx) => (
