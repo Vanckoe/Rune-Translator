@@ -14,7 +14,7 @@ export default function Home() {
             setInputValue(value);
           }}
         />
-        <p className="">wefwefwefwe Get started by editing </p>
+        <p className="">Demo version : A project in development</p>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a

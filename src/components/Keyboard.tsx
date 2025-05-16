@@ -9,15 +9,31 @@ const EN_LAYOUT = [
   ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
   ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-  ['z', 'x', 'c', 'v', 'b', 'n', 'm', 'space'],
+  ['z', 'x', 'c', 'v', 'b', 'n', 'm', 'ə', 'ç', 'ğ', 'ı', 'ö', 'ş', 'ü', 'o‘', 'g‘', 'sh', 'ch', 'space'],
 ];
 
 const RU_LAYOUT = [
   ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
   ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з'],
   ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д'],
-  ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'space'],
+  ['я', 'ч', 'с', 'м', 'и', 'т', 'ь','ә', 'ғ', 'қ', 'ң', 'ө', 'ұ', 'ү', 'і', 'ї', 'һ', 'space'],
 ];
+
+const runicMap: Record<string, string> = {
+  'a': '𐰀', 'e': '𐰀', 'o': '𐰆', 'u': '𐰆', 'ö': '𐰇', 'ü': '𐰇', 'ı': '𐰃', 'i': '𐰃',
+  'b': '𐰉', 'v': '𐰉', 'p': '𐰯', 't': '𐱅', 'd': '𐱅', 'k': '𐰴', 'q': '𐰴', 'g': '𐰍', 'ğ': '𐰍',
+  'm': '𐰢', 'n': '𐰤', 'ñ': '𐰭', 'l': '𐰠', 'r': '𐰼', 's': '𐰽', 'z': '𐰔',
+  'ç': '𐰲', 'ş': '𐰳', 'y': '𐰖', 'h': '𐰴', 'ə': '𐰀', 'o‘': '𐰆', 'g‘': '𐰍', 'sh': '𐰳', 'ch': '𐰲',
+  'ә': '𐰀', 'ғ': '𐰍', 'қ': '𐰴', 'ң': '𐰭', 'ө': '𐰇', 'ұ': '𐰆', 'ү': '𐰇', 'і': '𐰃',
+  'й': '𐰖', 'ц': '𐰲', 'у': '𐰆', 'к': '𐰴', 'е': '𐰀', 'н': '𐰤', 'г': '𐰍', 'ш': '𐰳', 'щ': '𐰳',
+  'з': '𐰔', 'ф': '𐰯', 'ы': '𐰃', 'в': '𐰉', 'а': '𐰀', 'п': '𐰯', 'р': '𐰼', 'о': '𐰆', 'л': '𐰠', 'д': '𐱅',
+  'ж': '𐰲', 'э': '𐰀', 'я': '𐰀𐰖', 'ч': '𐰲', 'с': '𐰽', 'м': '𐰢', 'и': '𐰃', 'т': '𐱅', 'ь': '',
+  'ҳ': '𐰴', 'ї': '𐰃'
+};
+
+const transliterateToRunic = (input: string): string => {
+  return input.split('').map(char => runicMap[char.toLowerCase()] || char).join('');
+};
 
 const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
   const [inputValue, setInputValue] = useState('');
@@ -51,12 +67,6 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
     onValueChange?.(newValue);
   };
 
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
-
   const toggleLayout = () => {
     setLayout(layout === 'EN' ? 'RU' : 'EN');
   };
@@ -73,7 +83,9 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
           Switch to {layout === 'EN' ? 'Cirilic' : 'Latinic'}
         </button>
         <div className="flex flex-row justify-between w-full">
-          <div className="w-full p-2 mb-4 text-end pr-10">wefewfwef</div>
+          <div className="w-full p-2 mb-4 text-end pr-10">
+            {transliterateToRunic(inputValue)}
+          </div>
           <div className="w-full border-l pl-10">
             <input
               ref={inputRef}
