@@ -22,6 +22,18 @@ const CYRILLIC_LAYOUT = [
   ['қ', 'ң', 'ө', 'ұ', 'ү', 'і', 'ї', 'һ'],
 ];
 
+const RUNIC_LAYOUT = [
+  ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+  ['𐰀', '𐰁', '𐰂', '𐰃', '𐰄', '𐰅', '𐰆', '𐰇', '𐰈', '𐰉'],
+  ['𐰊', '𐰋', '𐰌', '𐰍', '𐰏', '𐰐', '𐰑', '𐰒', '𐰓', '𐰔'],
+  ['𐰕', '𐰖', '𐰗', '𐰘', '𐰙', '𐰚', '𐰛', '𐰜', '𐰝', '𐰞'],
+  ['𐰟', '𐰠', '𐰡', '𐰢', '𐰣', '𐰤', '𐰥', '𐰦', '𐰧', '𐰨'],
+  ['𐰩', '𐰪', '𐰫', '𐰬', '𐰭', '𐰮', '𐰯', '𐰰', '𐰱', '𐰲'],
+  ['𐰳', '𐰴', '𐰵', '𐰶', '𐰷', '𐰸', '𐰹', '𐰺', '𐰻', '𐰼'],
+  ['𐰽', '𐰾', '𐰿', '𐱀', '𐱁', '𐱂', '𐱃', '𐱄', '𐱅', '𐱆'],
+  ['𐱇', '𐱈', '𐱉', '𐱊', '𐱋', '𐱌', '𐱍', '𐱎', '𐱏', '𐱐'],
+];
+
 const runicMap: Record<string, string> = {
   a: '𐰀',
   e: '𐰀',
@@ -151,7 +163,8 @@ const transliterateFromRunic = (input: string, layout: string): string => {
 
 const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
   const [inputValue, setInputValue] = useState('');
-  const [layout, setLayout] = useState('LATIN');
+  type Layout = 'LATIN' | 'CYRILLIC' | 'RUNIC';
+  const [layout, setLayout] = useState<Layout>('LATIN');
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -182,10 +195,21 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
   };
 
   const toggleLayout = () => {
-    setLayout(layout === 'LATIN' ? 'CYRILLIC' : 'LATIN');
+    setLayout(
+      layout === 'LATIN'
+        ? 'CYRILLIC'
+        : layout === 'CYRILLIC'
+        ? 'RUNIC'
+        : 'LATIN'
+    );
   };
 
-  const currentLayout = layout === 'LATIN' ? LATIN_LAYOUT : CYRILLIC_LAYOUT;
+  const currentLayout =
+    layout === 'LATIN'
+      ? LATIN_LAYOUT
+      : layout === 'CYRILLIC'
+      ? CYRILLIC_LAYOUT
+      : RUNIC_LAYOUT;
 
   return (
     <>
@@ -194,7 +218,12 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
           onClick={toggleLayout}
           className="px-4 py-2 w-fit bg-blue-600 text-white rounded-lg hover:bg-blue-500"
         >
-          Switch to {layout === 'LATIN' ? 'Cirilic' : 'Latinic'}
+          Switch to{' '}
+          {layout === 'LATIN'
+            ? 'Cirilic'
+            : layout === 'CYRILLIC'
+            ? 'Runic'
+            : 'Latinic'}
         </button>
         <div className="flex flex-col gap-5 md:flex-row justify-between w-full">
           <div className="w-full md:pr-10">
