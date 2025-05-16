@@ -208,7 +208,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
               onChange={handleChange}
               onPaste={handlePaste}
               rows={4}
-              className="w-full p-2 bg-transparent text-2xl text-end text-white rounded-lg md:mb-4 focus:outline-none"
+              className="w-full p-2 bg-transparent text-2xl text-end rounded-lg md:mb-4 focus:outline-none"
             />
           </div>
 
@@ -220,7 +220,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
               onChange={handleChange}
               onPaste={handlePaste}
               rows={4}
-              className="w-full p-2 bg-transparent text-2xl text-white rounded-lg mb-4 focus:outline-none"
+              className="w-full p-2 bg-transparent text-2xl rounded-lg mb-4 focus:outline-none"
             />
           </div>
         </div>
