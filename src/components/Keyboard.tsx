@@ -9,9 +9,9 @@ const EN_LAYOUT = [
   ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
   ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-  ['z', 'x', 'c', 'v', 'b'],
-  ['n', 'm', 'ə', 'ç', 'ğ'],
-  ['ı', 'ö', 'ş', 'ü', 'o‘', 'g‘', 'sh', 'ch'],
+  ['z', 'c', 'v', 'b'],
+  ['n', 'm','o‘', 'ə', 'ç', 'ğ'],
+  ['ı', 'ö', 'ş', 'ü',  'g‘', 'sh', 'ch'],
 ];
 
 const RU_LAYOUT = [
@@ -32,11 +32,14 @@ const runicMap: Record<string, string> = {
   ü: '𐰇',
   ı: '𐰃',
   i: '𐰃',
+  w: '𐰉',
   b: '𐰉',
+  c: '𐰽',
   v: '𐰉',
   p: '𐰯',
   t: '𐱅',
   d: '𐱅',
+  f: '𐰯',
   k: '𐰴',
   q: '𐰴',
   g: '𐰍',
@@ -57,6 +60,15 @@ const runicMap: Record<string, string> = {
   'g‘': '𐰍',
   sh: '𐰳',
   ch: '𐰲',
+  ŋ: '𐰭',
+  ŋg: '𐰭𐰍',
+  dž: '𐰲',
+  nd: '𐰤𐱅',
+  nt: '𐰤𐱅',
+  ld: '𐰠𐱅',
+  lt: '𐰠𐱅',
+  ny: '𐰭𐰖',
+  nç: '𐰭𐰲',
   ә: '𐰀',
   ғ: '𐰍',
   қ: '𐰴',
@@ -72,6 +84,7 @@ const runicMap: Record<string, string> = {
   е: '𐰀',
   н: '𐰤',
   г: '𐰍',
+  х: '𐰴',
   ш: '𐰳',
   щ: '𐰳',
   з: '𐰔',
@@ -95,15 +108,7 @@ const runicMap: Record<string, string> = {
   ь: '',
   ҳ: '𐰴',
   ї: '𐰃',
-  ŋ: '𐰭',
-  ŋg: '𐰭𐰍',
-  dž: '𐰲',
-  nd: '𐰤𐱅',
-  nt: '𐰤𐱅',
-  ld: '𐰠𐱅',
-  lt: '𐰠𐱅',
-  ny: '𐰭𐰖',
-  nç: '𐰭𐰲',
+
 };
 const transliterateToRunic = (input: string): string => {
   return input
@@ -232,13 +237,13 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
           </button>
         ))}
         <button
-          className="col-span-4 md:col-span-7 p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+          className="col-span-4 md:col-span-2 p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
           onClick={() => handleKeyPress('space')}
         >
           space
         </button>
         <button
-          className="col-span-2 md:col-span-3 p-2 bg-red-600 text-white rounded-lg hover:bg-red-500"
+          className="col-span-2 md:col-span-2 p-2 bg-red-600 text-white rounded-lg hover:bg-red-500"
           onClick={() => handleKeyPress('bksp')}
         >
           ⌫

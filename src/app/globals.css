@@ -34,7 +34,7 @@ body {
   background-color: #444;
 }
 .container{
-  max-width: 80rem;
+  max-width: 70rem;
 }
 
 @media (max-width: 767px) {
