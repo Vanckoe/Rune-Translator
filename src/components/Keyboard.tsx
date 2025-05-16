@@ -9,51 +9,17 @@ const EN_LAYOUT = [
   ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
   ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-  [
-    'z',
-    'x',
-    'c',
-    'v',
-    'b',
-    'n',
-    'm',
-    'ə',
-    'ç',
-    'ğ',
-    'ı',
-    'ö',
-    'ş',
-    'ü',
-    'o‘',
-    'g‘',
-    'sh',
-    'ch',
-  ],
+  ['z', 'x', 'c', 'v', 'b'],
+  ['n', 'm', 'ə', 'ç', 'ğ'],
+  ['ı', 'ö', 'ş', 'ü', 'o‘', 'g‘', 'sh', 'ch'],
 ];
 
 const RU_LAYOUT = [
   ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
   ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з'],
   ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д'],
-  [
-    'я',
-    'ч',
-    'с',
-    'м',
-    'и',
-    'т',
-    'ь',
-    'ә',
-    'ғ',
-    'қ',
-    'ң',
-    'ө',
-    'ұ',
-    'ү',
-    'і',
-    'ї',
-    'һ',
-  ],
+  ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'ә', 'ғ'],
+  ['қ', 'ң', 'ө', 'ұ', 'ү', 'і', 'ї', 'һ'],
 ];
 
 const runicMap: Record<string, string> = {
@@ -230,7 +196,10 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
           <div className="w-full md:pr-10">
             <textarea
               ref={inputRef}
-              value={transliterateToRunic(inputValue)}
+              value={transliterateFromRunic(
+                transliterateToRunic(inputValue),
+                layout
+              )}
               placeholder="...𐰢𐰆𐰤𐱅𐰀 𐱅𐰀𐰼𐰃𐰭𐰃𐰔"
               onChange={handleChange}
               onPaste={handlePaste}
