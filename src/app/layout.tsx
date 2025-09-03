@@ -1,20 +1,21 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+import TurnstileGate from '@/components/TurnstileGate';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "𐰍𐰇𐰴 𐱅𐰆𐰼𐰴",
-  description: "translator from Turkic runes to Latin or Cyrillic",
+  title: '𐰍𐰇𐰴 𐱅𐰆𐰼𐰴',
+  description: 'translator from Turkic runes to Latin or Cyrillic',
 };
 
 export default function RootLayout({
@@ -27,7 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-[family-name:var(--font-geist-mono)] antialiased`}
       >
-        {children}
+        <TurnstileGate action="landing_view">{children}</TurnstileGate>
       </body>
     </html>
   );
