@@ -280,9 +280,8 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
               onPaste={handlePaste}
               rows={4}
               className="w-full p-2 bg-transparent text-2xl text-end rounded-lg md:mb-4 focus:outline-none"
-              readOnly={layout !== 'RUNIC'}
             />
-            <div className="flex flex-row gap-5 items-center ">
+            <div className="flex flex-row gap-4 items-center ">
               <button
                 onClick={toggleLayout}
                 className="px-4 py-2 w-fit rounded-lg border  hover:scale-95 transition-transform"
@@ -323,7 +322,6 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
                 onPaste={handlePaste}
                 rows={4}
                 className="w-full p-2 bg-transparent text-2xl rounded-lg md:mb-4 focus:outline-none"
-                readOnly={layout === 'RUNIC'}
               />
             </div>
           </div>

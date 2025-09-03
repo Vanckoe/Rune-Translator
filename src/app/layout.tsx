@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rune Translator",
+  title: "𐰍𐰇𐰴 𐱅𐰆𐰼𐰴",
   description: "translator from Turkic runes to Latin or Cyrillic",
 };
 
