@@ -108,8 +108,8 @@ export default function TurnstileGate({
 
           {!error ? (
             <p className="mt-6 text-center text-xs text-neutral-500">
-              Это займёт пару секунд. Ваш браузер не выполняет никаких лишних
-              действий.
+              Это займёт пару секунд. Ваш браузер <br /> не выполняет никаких
+              лишних действий.
             </p>
           ) : (
             <div className="mt-6 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
@@ -122,32 +122,6 @@ export default function TurnstileGate({
               </button>
             </div>
           )}
-
-          <footer className="pointer-events-none absolute bottom-6 left-0 right-0 mx-auto flex max-w-5xl items-center justify-between px-6 text-[11px] text-neutral-500">
-            <span>
-              © {new Date().getFullYear()} {brand}
-            </span>
-            <span className="pointer-events-auto">
-              Protected by Cloudflare Turnstile ·{' '}
-              <a
-                className="underline"
-                href="https://www.cloudflare.com/privacypolicy/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Privacy
-              </a>{' '}
-              ·{' '}
-              <a
-                className="underline"
-                href="https://www.cloudflare.com/website-terms/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Terms
-              </a>
-            </span>
-          </footer>
         </div>
       </div>
 
