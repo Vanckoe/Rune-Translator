@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
@@ -11,8 +11,20 @@
     --foreground: #ededed;
   }
 }
+.grecaptcha-badge,
+.cf-turnstile-badge {
+  position: fixed !important;
+  left: 50% !important;
+  bottom: 20px !important;
+  top: auto !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  z-index: 50 !important;
+  transition: opacity 0.5s ease-in-out !important;
+  opacity: 1;
+}
 
-html{
+html {
   font-size: 0.9vw;
 }
 body {
@@ -33,7 +45,7 @@ body {
 .hg-button:hover {
   background-color: #444;
 }
-.container{
+.container {
   max-width: 70rem;
 }
 

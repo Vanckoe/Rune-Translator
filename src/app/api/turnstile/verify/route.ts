@@ -40,7 +40,6 @@ export async function POST(req: NextRequest) {
         method: 'POST',
         body: formData,
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        // (опционально) можно добавить next: { revalidate: 0 } если нужно
       }
     );
 
@@ -53,7 +52,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Для простого POC выставим cookie-флаг на 10 минут — чтобы не гонять проверку на каждом переходе
     const res = NextResponse.json({ ok: true });
     res.cookies.set('cf_turnstile_ok', '1', {
       httpOnly: true,
