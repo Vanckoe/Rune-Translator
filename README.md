@@ -16,6 +16,11 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+The `dev` script disables Node.js Web Storage when the runtime supports it.
+This avoids a `localStorage.getItem is not a function` error in the Next.js 15
+development overlay on Node.js 25. Browser localStorage is unaffected.
+Extra arguments are forwarded to Next.js, for example `npm run dev -- --port 3100`.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
