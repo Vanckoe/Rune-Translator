@@ -21,6 +21,23 @@ This avoids a `localStorage.getItem is not a function` error in the Next.js 15
 development overlay on Node.js 25. Browser localStorage is unaffected.
 Extra arguments are forwarded to Next.js, for example `npm run dev -- --port 3100`.
 
+## Transliteration
+
+Use the two-arrow button to switch between **Text → Runes** and **Runes → Text**,
+then select Latin or Cyrillic.
+Type or paste into the input field, or use the on-screen keyboard.
+**Copy translation** copies the result for the selected direction.
+
+Reverse transliteration uses the project's existing character table. Several
+letters share a rune, so the original spelling cannot always be recovered;
+unmapped symbols are preserved.
+
+Run the transliteration tests with Node.js 22.18+:
+
+```bash
+node --test tests/transliteration.test.mjs
+```
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

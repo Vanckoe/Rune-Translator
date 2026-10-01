@@ -1,5 +1,6 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
+import { transliterateFromRunic, transliterateToRunic, type TextAlphabet } from '@/lib/transliteration';
 import toast, { Toaster } from 'react-hot-toast';
 import Paper from '@/assets/Paper';
 
@@ -22,7 +23,7 @@ const CYRILLIC_LAYOUT = [
   ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з'],
   ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д'],
   ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'ә', 'ғ'],
-  ['қ', 'ң', 'ө', 'ұ', 'ү', 'і', 'ї', 'һ'],
+  ['қ', 'ң', 'ө', 'ұ', 'ү', 'і', 'ї', 'һ', 'б'],
 ];
 
 const RUNIC_LAYOUT = [
@@ -37,137 +38,6 @@ const RUNIC_LAYOUT = [
   ['𐱇', '𐱈', '𐱉', '𐱊', '𐱋', '𐱌', '𐱍', '𐱎', '𐱏', '𐱐'],
 ];
 
-/* ---------- соответствия символов ---------- */
-const runicMap: Record<string, string> = {
-  a: '𐰀',
-  e: '𐰀',
-  ä: '𐰀',
-  o: '𐰆',
-  u: '𐰆',
-  ö: '𐰇',
-  ü: '𐰇',
-  ı: '𐰃',
-  i: '𐰃',
-  w: '𐰉',
-  b: '𐰉',
-  c: '𐰽',
-  v: '𐰉',
-  p: '𐰯',
-  t: '𐱅',
-  d: '𐱅',
-  f: '𐰯',
-  k: '𐰴',
-  q: '𐰴',
-  g: '𐰍',
-  ğ: '𐰍',
-  m: '𐰢',
-  n: '𐰤',
-  ñ: '𐰭',
-  l: '𐰠',
-  r: '𐰼',
-  s: '𐰽',
-  z: '𐰔',
-  ç: '𐰲',
-  ş: '𐰳',
-  y: '𐰖',
-  h: '𐰴',
-  ə: '𐰀',
-  'o‘': '𐰆',
-  'g‘': '𐰍',
-  sh: '𐰳',
-  ch: '𐰲',
-  ŋ: '𐰭',
-  ŋg: '𐰭𐰍',
-  dž: '𐰲',
-  nd: '𐰤𐱅',
-  nt: '𐰤𐱅',
-  ld: '𐰠𐱅',
-  lt: '𐰠𐱅',
-  ny: '𐰭𐰖',
-  nç: '𐰭𐰲',
-  ә: '𐰀',
-  ғ: '𐰍',
-  қ: '𐰴',
-  ң: '𐰭',
-  ө: '𐰇',
-  ұ: '𐰆',
-  ү: '𐰇',
-  і: '𐰃',
-  й: '𐰖',
-  ц: '𐰲',
-  у: '𐰆',
-  к: '𐰴',
-  е: '𐰀',
-  н: '𐰤',
-  г: '𐰍',
-  х: '𐰴',
-  ш: '𐰳',
-  щ: '𐰳',
-  з: '𐰔',
-  ф: '𐰯',
-  ы: '𐰃',
-  в: '𐰉',
-  а: '𐰀',
-  п: '𐰯',
-  р: '𐰼',
-  о: '𐰆',
-  л: '𐰠',
-  д: '𐱅',
-  ж: '𐰲',
-  э: '𐰀',
-  я: '𐰀𐰖',
-  ч: '𐰲',
-  с: '𐰽',
-  м: '𐰢',
-  и: '𐰃',
-  т: '𐱅',
-  ь: '',
-  ҳ: '𐰴',
-  ї: '𐰃',
-};
-
-const reverseRunicMap: Record<string, { latin: string; cyrillic: string }> = {
-  '𐰀': { latin: 'a', cyrillic: 'а' },
-  '𐰃': { latin: 'i', cyrillic: 'и' },
-  '𐰆': { latin: 'o', cyrillic: 'о' },
-  '𐰇': { latin: 'ö', cyrillic: 'ө' },
-  '𐰉': { latin: 'b', cyrillic: 'б' },
-  '𐰯': { latin: 'p', cyrillic: 'п' },
-  '𐱅': { latin: 't', cyrillic: 'т' },
-  '𐰴': { latin: 'k', cyrillic: 'к' },
-  '𐰍': { latin: 'g', cyrillic: 'г' },
-  '𐰢': { latin: 'm', cyrillic: 'м' },
-  '𐰤': { latin: 'n', cyrillic: 'н' },
-  '𐰭': { latin: 'ñ', cyrillic: 'ң' },
-  '𐰠': { latin: 'l', cyrillic: 'л' },
-  '𐰼': { latin: 'r', cyrillic: 'р' },
-  '𐰽': { latin: 's', cyrillic: 'с' },
-  '𐰔': { latin: 'z', cyrillic: 'з' },
-  '𐰲': { latin: 'ch', cyrillic: 'ч' },
-  '𐰳': { latin: 'sh', cyrillic: 'ш' },
-  '𐰖': { latin: 'y', cyrillic: 'й' },
-};
-
-/* ---------- функции транслитерации ---------- */
-const transliterateToRunic = (str: string): string =>
-  str
-    .split('')
-    .map((ch) => runicMap[ch.toLowerCase()] ?? ch)
-    .join('');
-
-const transliterateFromRunic = (
-  str: string,
-  layout: 'LATIN' | 'CYRILLIC'
-): string =>
-  str
-    .split('')
-    .map((ch) => {
-      const map = reverseRunicMap[ch];
-      if (!map) return ch;
-      return layout === 'LATIN' ? map.latin : map.cyrillic;
-    })
-    .join('');
-
 /* ---------- сам компонент ---------- */
 const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
   /** текст нижнего поля (латиница/кириллица) */
@@ -175,40 +45,38 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
   /** текст верхнего поля (руны) */
   const [inputRunic, setInputRunic] = useState('');
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success('Copied!');
-  };
-
-  type Layout = 'LATIN' | 'CYRILLIC' | 'RUNIC';
-  const [layout, setLayout] = useState<Layout>('LATIN');
-  /** последняя не-рунная раскладка (для перевода) */
-  const [targetLayout, setTargetLayout] =
-    useState<Exclude<Layout, 'RUNIC'>>('LATIN');
-
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  /* ---------- переключатель раскладок ---------- */
-  const toggleLayout = () => {
-    if (layout === 'LATIN') {
-      setLayout('CYRILLIC');
-      setTargetLayout('CYRILLIC');
-    } else if (layout === 'CYRILLIC') {
-      setLayout('RUNIC');
-    } else if (layout === 'RUNIC') {
-      setLayout('LATIN');
-      setTargetLayout('LATIN');
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Copied!');
+    } catch {
+      toast.error('Could not copy. Select and copy the text manually.');
     }
   };
 
-  /* ---------- синхронизация при смене раскладки ---------- */
-  useEffect(() => {
-    if (layout === 'RUNIC') {
-      setInputValue(transliterateFromRunic(inputRunic, targetLayout));
+  const [direction, setDirection] = useState<'TO_RUNIC' | 'FROM_RUNIC'>('TO_RUNIC');
+  const [targetLayout, setTargetLayout] = useState<TextAlphabet>('LATIN');
+  const layout = direction === 'FROM_RUNIC' ? 'RUNIC' : targetLayout;
+
+  const changeDirection = (next: 'TO_RUNIC' | 'FROM_RUNIC') => {
+    setDirection(next);
+    if (next === 'FROM_RUNIC') {
+      const converted = transliterateFromRunic(inputRunic, targetLayout);
+      setInputValue(converted);
+      onValueChange?.(converted);
     } else {
       setInputRunic(transliterateToRunic(inputValue));
     }
-  }, [layout]); // eslint-disable-line react-hooks/exhaustive-deps
+  };
+
+  const changeAlphabet = (next: TextAlphabet) => {
+    setTargetLayout(next);
+    if (direction === 'FROM_RUNIC') {
+      const converted = transliterateFromRunic(inputRunic, next);
+      setInputValue(converted);
+      onValueChange?.(converted);
+    }
+  };
 
   /* ---------- обработчики ввода ---------- */
   const handleLatinCyrChange = (val: string) => {
@@ -224,26 +92,16 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
     onValueChange?.(converted);
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData('text');
-    if (layout === 'RUNIC') {
-      handleRunicChange(inputRunic + pasted);
-    } else {
-      handleLatinCyrChange(inputValue + pasted);
-    }
-  };
-
   const handleKeyPress = (key: string) => {
     if (layout === 'RUNIC') {
       let val = inputRunic;
-      if (key === 'bksp') val = val.slice(0, -1);
+      if (key === 'bksp') val = Array.from(val).slice(0, -1).join('');
       else if (key === 'space') val += ' ';
       else val += key;
       handleRunicChange(val);
     } else {
       let val = inputValue;
-      if (key === 'bksp') val = val.slice(0, -1);
+      if (key === 'bksp') val = Array.from(val).slice(0, -1).join('');
       else if (key === 'space') val += ' ';
       else val += key;
       handleLatinCyrChange(val);
@@ -263,49 +121,71 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
     <>
       <Toaster position="top-center" />
       <div className="relative w-full flex flex-col gap-5">
+        <div className="flex flex-wrap items-end gap-4">
+          <button
+            type="button"
+            onClick={() => changeDirection(direction === 'TO_RUNIC' ? 'FROM_RUNIC' : 'TO_RUNIC')}
+            aria-label="Switch translation direction"
+            aria-pressed={direction === 'FROM_RUNIC'}
+            title={direction === 'TO_RUNIC' ? 'Switch to Runes → Text' : 'Switch to Text → Runes'}
+            className="group flex size-12 min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-white/15 bg-neutral-900 text-neutral-300 shadow-sm transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:border-white/30 hover:bg-neutral-800 hover:text-white hover:shadow-md active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-300 motion-reduce:transition-none motion-reduce:transform-none"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className={`transition-transform duration-300 ease-in-out motion-reduce:transition-none ${direction === 'FROM_RUNIC' ? 'rotate-180' : 'rotate-0'}`}
+            >
+              <path d="M4 7h16m-4-4 4 4-4 4" />
+              <path d="M20 17H4m4-4-4 4 4 4" />
+            </svg>
+          </button>
+          <label className="flex flex-col gap-2">
+            <span>{direction === 'FROM_RUNIC' ? 'Output alphabet' : 'Input alphabet'}</span>
+            <select
+              value={targetLayout}
+              onChange={(event) => changeAlphabet(event.target.value as TextAlphabet)}
+              className="rounded-lg border bg-gray-900 px-4 py-2 text-white focus-visible:outline-2"
+            >
+              <option value="LATIN">Latin</option>
+              <option value="CYRILLIC">Cyrillic</option>
+            </select>
+          </label>
+        </div>
+        {direction === 'FROM_RUNIC' && (
+          <p className="text-sm" id="reverse-note">
+            Transliteration is approximate: one rune can represent several letters.
+            Unmapped symbols are kept unchanged.
+          </p>
+        )}
         <div className="flex flex-col gap-5 md:flex-row justify-between w-full">
           {/* верхнее поле (руны) */}
           <div className="w-full flex flex-col md:pr-10">
             <textarea
-              ref={inputRef}
-              value={
-                layout === 'RUNIC'
-                  ? inputRunic
-                  : transliterateToRunic(inputValue)
-              }
+              aria-label="Runes"
+              aria-describedby={direction === 'FROM_RUNIC' ? 'reverse-note' : undefined}
+              readOnly={direction !== 'FROM_RUNIC'}
+              value={inputRunic}
               placeholder="...𐰢𐰆𐰤𐱅𐰀 𐱅𐰀𐰼𐰃𐰭𐰃𐰔"
               onChange={(e) =>
                 layout === 'RUNIC' && handleRunicChange(e.target.value)
               }
-              onPaste={handlePaste}
               rows={4}
-              className="w-full p-2 bg-transparent text-2xl text-end rounded-lg md:mb-4 focus:outline-none"
+              className="w-full p-2 bg-transparent text-2xl text-end rounded-lg md:mb-4 focus-visible:outline-2"
             />
             <div className="flex flex-row gap-4 items-center ">
               <button
-                onClick={toggleLayout}
-                className="px-4 py-2 w-fit rounded-lg border  hover:scale-95 transition-transform"
-              >
-                {layout === 'LATIN'
-                  ? 'Latin'
-                  : layout === 'CYRILLIC'
-                  ? 'Cyrillic'
-                  : targetLayout === 'LATIN'
-                  ? 'Latin'
-                  : 'Runic'}
-              </button>
-              <button
-                onClick={() =>
-                  handleCopy(
-                    layout === 'RUNIC'
-                      ? inputRunic
-                      : transliterateToRunic(inputValue)
-                  )
-                }
+                onClick={() => handleCopy(direction === 'FROM_RUNIC' ? inputValue : inputRunic)}
                 className="px-4 py-2 flex flex-row items-center gap-3 w-fit rounded-lg border hover:scale-95 transition-transform"
-                title="Копировать текст"
+                title="Copy translation"
               >
-                <Paper color="white" /> Copy
+                <Paper color="white" /> Copy translation
               </button>
             </div>
           </div>
@@ -314,14 +194,15 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
           <div className="w-full border-t md:border-t-0 pt-5 md:pt-0 md:border-l md:pl-10">
             <div className="relative">
               <textarea
+                aria-label={targetLayout === 'LATIN' ? 'Latin text' : 'Cyrillic text'}
+                readOnly={direction === 'FROM_RUNIC'}
                 value={inputValue}
                 placeholder="Type here..."
                 onChange={(e) =>
                   layout !== 'RUNIC' && handleLatinCyrChange(e.target.value)
                 }
-                onPaste={handlePaste}
                 rows={4}
-                className="w-full p-2 bg-transparent text-2xl rounded-lg md:mb-4 focus:outline-none"
+                className="w-full p-2 bg-transparent text-2xl rounded-lg md:mb-4 focus-visible:outline-2"
               />
             </div>
           </div>
@@ -356,6 +237,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onValueChange }) => {
         </button>
         <button
           className="col-span-2 md:col-span-2 p-2 bg-red-600 text-white rounded-lg hover:bg-red-500"
+          aria-label="Backspace"
           onClick={() => handleKeyPress('bksp')}
         >
           ⌫
